@@ -13,7 +13,6 @@
             margin: 0;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
-            position: relative;
         }
         .container {
             text-align: center;
@@ -26,11 +25,6 @@
             position: absolute;
             top: 0;
         }
-        .username {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
         .coin {
             width: 100px;
             height: 100px;
@@ -38,40 +32,16 @@
             border-radius: 50%;
             display: inline-block;
             position: relative;
-            cursor: pointer;
         }
         .scoreboard {
             margin-top: 20px;
             font-size: 2em;
         }
-        .bar-container {
-            position: relative;
-            height: 20px;
-            width: 80%;
-            background-color: #ccc;
-            border-radius: 10px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        .bar {
-            height: 100%;
-            background-color: green;
-            width: 100%;
-            transition: width 0.5s;
-            text-align: center;
-            color: white;
-            line-height: 20px;
-        }
-        .upgrade, .felafel-turbo {
+        .upgrade {
             margin-top: 20px;
             font-size: 1em;
-            cursor: pointer;
-        }
-        .upgrade {
             color: blue;
-        }
-        .felafel-turbo {
-            color: orange;
+            cursor: pointer;
         }
         .animate {
             animation: hitAnimation 0.3s ease-in-out;
@@ -92,10 +62,6 @@
             right: 10px;
             cursor: pointer;
         }
-        .leaderboard {
-            margin-top: 20px;
-            font-size: 1em;
-        }
         @keyframes hitAnimation {
             0% { transform: scale(1); }
             50% { transform: scale(1.2); }
@@ -115,158 +81,86 @@
     <div class="header">
         Tap to earn Mahyar Coin
         <div class="reset-button" id="reset">Reset</div>
-        <div class="username" id="username">User: yourusername</div>
     </div>
     <div class="container">
         <div class="coin" id="coin"></div>
         <div class="scoreboard">
             <span id="score">0</span>
         </div>
-        <div class="bar-container">
-            <div class="bar" id="bar">350</div>
-        </div>
-        <div class="upgrade" id="upgrade">2x tap (Cost: 300 Mahyar Coin)</div>
-        <div class="felafel-turbo" id="turbo">Felafel Turbo (3 times per day)</div>
-        <div class="leaderboard" id="leaderboard"><strong>Leaderboard</strong></div>
+        <div class="upgrade" id="upgrade">2x tap (Cost: 1500 Mahyar Coin)</div>
         <div class="error" id="error"></div>
     </div>
 
     <script>
         let score = 0;
         let multiplier = 1;
-        let barValue = 350;
-        let turboRemaining = 3;
-        const maxBarValue = 350;
         const coinElement = document.getElementById('coin');
         const scoreElement = document.getElementById('score');
-        const barElement = document.getElementById('bar');
         const upgradeElement = document.getElementById('upgrade');
-        const turboElement = document.getElementById('turbo');
         const errorElement = document.getElementById('error');
         const resetElement = document.getElementById('reset');
-        const leaderboardElement = document.getElementById('leaderboard');
-        const usernameElement = document.getElementById('username');
-
-        function updateBar() {
-            barElement.style.width = `${(barValue / maxBarValue) * 100}%`;
-            barElement.innerText = barValue;
-        }
-
-        function updateTurboCount() {
-            turboElement.innerText = `Felafel Turbo (${turboRemaining} times per day)`;
-        }
-
-        function updateLeaderboard() {
-            let scores = JSON.parse(localStorage.getItem('scores')) || [];
-            scores.push({ username: usernameElement.innerText, score, date: new Date() });
-            scores.sort((a, b) => b.score - a.score);
-            scores = scores.slice(0, 10);
-            localStorage.setItem('scores', JSON.stringify(scores));
-
-            let leaderboardHTML = '<ul>';
-            for (let entry of scores) {
-                leaderboardHTML += `<li>${entry.username} - ${entry.score} - ${new Date(entry.date).toLocaleString()}</li>`;
-            }
-            leaderboardHTML += '</ul>';
-            leaderboardElement.innerHTML = leaderboardHTML;
-        }
 
         coinElement.addEventListener('click', function(event) {
-            if (barValue > 0) {
-                score += multiplier;
-                scoreElement.innerText = score;
+            score += multiplier;
+            scoreElement.innerText = score;
 
-                // نمایش انیمیشن ضربه
-                this.classList.remove('animate');
-                void this.offsetWidth; // ترفند برای ریست انیمیشن
-                this.classList.add('animate');
+            // نمایش انیمیشن ضربه
+            this.classList.remove('animate');
+            void this.offsetWidth; // ترفند برای ریست انیمیشن
+            this.classList.add('animate');
 
-                // نمایش +1 یا +2
-                const point = document.createElement('div');
-                point.className = 'point';
-                point.style.left = `${event.clientX - this.offsetLeft}px`;
-                point.style.top = `${event.clientY - this.offsetTop}px`;
-                point.innerText = `+${multiplier}`;
-                this.appendChild(point);
+            // نمایش +1 یا +2
+            const point = document.createElement('div');
+            point.className = 'point';
+            point.style.left = `${event.clientX - this.offsetLeft}px`;
+            point.style.top = `${event.clientY - this.offsetTop}px`;
+            point.innerText = `+${multiplier}`;
+            this.appendChild(point);
 
-                setTimeout(() => {
-                    point.remove();
-                }, 1000);
+            setTimeout(() => {
+                point.remove();
+            }, 1000);
 
-                // کم کردن از نوار حجم ضربات
-                barValue--;
-                updateBar();
-
-                // ذخیره امتیاز و بار
-                localStorage.setItem('score', score);
-                localStorage.setItem('barValue', barValue);
-
-                // به‌روزرسانی لیدربورد
-                updateLeaderboard();
-            } else {
-                errorElement.innerText = "No hits left. Please wait.";
-                errorElement.style.display = "block";
-                setTimeout(() => {
-                    errorElement.classList.add('fadeOut');
-                }, 5000);
-                setTimeout(() => {
-                    errorElement.innerText = "";
-                    errorElement.classList.remove('fadeOut');
-                    errorElement.style.display = "none";
-                }, 6000);
-            }
+            // ذخیره امتیاز
+            localStorage.setItem('score', score);
         });
 
         upgradeElement.addEventListener('click', function() {
-            if (score >= 300) {
-                score -= 300;
+            if (score >= 1500) {
+                score -= 1500;
                 multiplier = 2;
                 scoreElement.innerText = score;
-                upgradeElement.style.display = 'none';
                 localStorage.setItem('score', score);
                 localStorage.setItem('multiplier', multiplier);
             } else {
                 errorElement.innerText = "you don't have enough Mahyar Coin";
-                errorElement.style.display = "block";
                 setTimeout(() => {
                     errorElement.classList.add('fadeOut');
                 }, 5000);
                 setTimeout(() => {
                     errorElement.innerText = "";
                     errorElement.classList.remove('fadeOut');
-                    errorElement.style.display = "none";
-                }, 6000);
-            }
-        });
-
-        turboElement.addEventListener('click', function() {
-            if (turboRemaining > 0) {
-                turboRemaining--;
-                localStorage.setItem('turboRemaining', turboRemaining);
-                updateTurboCount();
-
-                let originalBarValue = barValue;
-                barValue = Math.min(maxBarValue, barValue * 3);
-                updateBar();
-                coinElement.style.backgroundColor = 'red';
-
-                setTimeout(() => {
-                    barValue = originalBarValue;
-                    updateBar();
-                    coinElement.style.backgroundColor = 'gold';
-                }, 15000);
-            } else {
-                errorElement.innerText = "No turbo boosts left for today.";
-                errorElement.style.display = "block";
-                setTimeout(() => {
-                    errorElement.classList.add('fadeOut');
-                }, 5000);
-                setTimeout(() => {
-                    errorElement.innerText = "";
-                    errorElement.classList.remove('fadeOut');
-                    errorElement.style.display = "none";
                 }, 6000);
             }
         });
 
         resetElement.addEventListener('click', function() {
+            score = 0;
+            multiplier = 1;
+            scoreElement.innerText = score;
+            localStorage.setItem('score', score);
+            localStorage.setItem('multiplier', multiplier);
+        });
+
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('score')) {
+                score = parseInt(localStorage.getItem('score'));
+                scoreElement.innerText = score;
+            }
+            if (localStorage.getItem('multiplier')) {
+                multiplier = parseInt(localStorage.getItem('multiplier'));
+            }
+        });
+    </script>
+</body>
+</html>
