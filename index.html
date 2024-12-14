@@ -13,6 +13,7 @@
             margin: 0;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            position: relative;
         }
         .container {
             text-align: center;
@@ -24,6 +25,11 @@
             text-align: center;
             position: absolute;
             top: 0;
+        }
+        .username {
+            position: absolute;
+            top: 10px;
+            left: 10px;
         }
         .coin {
             width: 100px;
@@ -56,17 +62,16 @@
             color: white;
             line-height: 20px;
         }
-        .upgrade {
+        .upgrade, .felafel-turbo {
             margin-top: 20px;
             font-size: 1em;
-            color: blue;
             cursor: pointer;
         }
+        .upgrade {
+            color: blue;
+        }
         .felafel-turbo {
-            margin-top: 10px;
-            font-size: 1em;
             color: orange;
-            cursor: pointer;
         }
         .animate {
             animation: hitAnimation 0.3s ease-in-out;
@@ -110,6 +115,7 @@
     <div class="header">
         Tap to earn Mahyar Coin
         <div class="reset-button" id="reset">Reset</div>
+        <div class="username" id="username">User: yourusername</div>
     </div>
     <div class="container">
         <div class="coin" id="coin"></div>
@@ -121,8 +127,8 @@
         </div>
         <div class="upgrade" id="upgrade">2x tap (Cost: 300 Mahyar Coin)</div>
         <div class="felafel-turbo" id="turbo">Felafel Turbo (3 times per day)</div>
+        <div class="leaderboard" id="leaderboard"><strong>Leaderboard</strong></div>
         <div class="error" id="error"></div>
-        <div class="leaderboard" id="leaderboard"></div>
     </div>
 
     <script>
@@ -139,6 +145,7 @@
         const errorElement = document.getElementById('error');
         const resetElement = document.getElementById('reset');
         const leaderboardElement = document.getElementById('leaderboard');
+        const usernameElement = document.getElementById('username');
 
         function updateBar() {
             barElement.style.width = `${(barValue / maxBarValue) * 100}%`;
@@ -151,14 +158,14 @@
 
         function updateLeaderboard() {
             let scores = JSON.parse(localStorage.getItem('scores')) || [];
-            scores.push({ score, date: new Date() });
+            scores.push({ username: usernameElement.innerText, score, date: new Date() });
             scores.sort((a, b) => b.score - a.score);
             scores = scores.slice(0, 10);
             localStorage.setItem('scores', JSON.stringify(scores));
 
-            let leaderboardHTML = '<strong>Leaderboard</strong><ul>';
+            let leaderboardHTML = '<ul>';
             for (let entry of scores) {
-                leaderboardHTML += `<li>${entry.score} - ${new Date(entry.date).toLocaleString()}</li>`;
+                leaderboardHTML += `<li>${entry.username} - ${entry.score} - ${new Date(entry.date).toLocaleString()}</li>`;
             }
             leaderboardHTML += '</ul>';
             leaderboardElement.innerHTML = leaderboardHTML;
@@ -263,13 +270,3 @@
         });
 
         resetElement.addEventListener('click', function() {
-            score = 0;
-            multiplier = 1;
-            barValue = maxBarValue;
-            turboRemaining = 3;
-            scoreElement.innerText = score;
-            updateBar();
-            updateTurboCount();
-            upgradeElement.style.display = 'block';
-            localStorage.setItem('score', score);
-            localStorage.setItem('multiplier', multiplier
