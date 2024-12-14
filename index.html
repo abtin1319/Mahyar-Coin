@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahyar Coin</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .header {
+            background-color: #d3d3d3;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            top: 0;
+        }
+        .coin {
+            width: 100px;
+            height: 100px;
+            background-color: gold;
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .scoreboard {
+            margin-top: 20px;
+            font-size: 2em;
+        }
+        .bar-container {
+            position: relative;
+            height: 20px;
+            width: 80%;
+            background-color: #ccc;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .bar {
+            height: 100%;
+            background-color: green;
+            width: 100%;
+            transition: width 0.5s;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+        }
+        .upgrade {
+            margin-top: 20px;
+            font-size: 1em;
+            color: blue;
+            cursor: pointer;
+        }
+        .felafel-turbo {
+            margin-top: 10px;
+            font-size: 1em;
+            color: orange;
+            cursor: pointer;
+        }
+        .animate {
+            animation: hitAnimation 0.3s ease-in-out;
+        }
+        .point {
+            position: absolute;
+            color: green;
+            font-size: 1.5em;
+            animation: moveUp 1s ease-out;
+        }
+        .error {
+            color: red;
+            animation: fadeOut 5s ease-in-out forwards;
+        }
+        .reset-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+        .leaderboard {
+            margin-top: 20px;
+            font-size: 1em;
+        }
+        @keyframes hitAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        @keyframes moveUp {
+            0% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-50px); }
+        }
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Tap to earn Mahyar Coin
+        <div class="reset-button" id="reset">Reset</div>
+    </div>
+    <div class="container">
+        <div class="coin" id="coin"></div>
+        <div class="scoreboard">
+            <span id="score">0</span>
+        </div>
+        <div class="bar-container">
+            <div class="bar" id="bar">350</div>
+        </div>
+        <div class="upgrade" id="upgrade">2x tap (Cost: 300 Mahyar Coin)</div>
+        <div class="felafel-turbo" id="turbo">Felafel Turbo (3 times per day)</div>
+        <div class="error" id="error"></div>
+        <div class="leaderboard" id="leaderboard"></div>
+    </div>
+
+    <script>
+        let score = 0;
+        let multiplier = 1;
+        let barValue = 350;
+        let turboRemaining = 3;
+        const maxBarValue = 350;
+        const coinElement = document.getElementById('coin');
+        const scoreElement = document.getElementById('score');
+        const barElement = document.getElementById('bar');
+        const upgradeElement = document.getElementById('upgrade');
+        const turboElement = document.getElementById('turbo');
+        const errorElement = document.getElementById('error');
+        const resetElement = document.getElementById('reset');
+        const leaderboardElement = document.getElementById('leaderboard');
+
+        function updateBar() {
+            barElement.style.width = `${(barValue / maxBarValue) * 100}%`;
+            barElement.innerText = barValue;
+        }
+
+        function updateTurboCount() {
+            turboElement.innerText = `Felafel Turbo (${turboRemaining} times per day)`;
+        }
+
+        function updateLeaderboard() {
+            let scores = JSON.parse(localStorage.getItem('scores')) || [];
+            scores.push({ score, date: new Date() });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 10);
+            localStorage.setItem('scores', JSON.stringify(scores));
+
+            let leaderboardHTML = '<strong>Leaderboard</strong><ul>';
+            for (let entry of scores) {
+                leaderboardHTML += `<li>${entry.score} - ${new Date(entry.date).toLocaleString()}</li>`;
+            }
+            leaderboardHTML += '</ul>';
+            leaderboardElement.innerHTML = leaderboardHTML;
+        }
+
+        coinElement.addEventListener('click', function(event) {
+            if (barValue > 0) {
+                score += multiplier;
+                scoreElement.innerText = score;
+
+                // نمایش انیمیشن ضربه
+                this.classList.remove('animate');
+                void this.offsetWidth; // ترفند برای ریست انیمیشن
+                this.classList.add('animate');
+
+                // نمایش +1 یا +2
+                const point = document.createElement('div');
+                point.className = 'point';
+                point.style.left = `${event.clientX - this.offsetLeft}px`;
+                point.style.top = `${event.clientY - this.offsetTop}px`;
+                point.innerText = `+${multiplier}`;
+                this.appendChild(point);
+
+                setTimeout(() => {
+                    point.remove();
+                }, 1000);
+
+                // کم کردن از نوار حجم ضربات
+                barValue--;
+                updateBar();
+
+                // ذخیره امتیاز و بار
+                localStorage.setItem('score', score);
+                localStorage.setItem('barValue', barValue);
+
+                // به‌روزرسانی لیدربورد
+                updateLeaderboard();
+            } else {
+                errorElement.innerText = "No hits left. Please wait.";
+                errorElement.style.display = "block";
+                setTimeout(() => {
+                    errorElement.classList.add('fadeOut');
+                }, 5000);
+                setTimeout(() => {
+                    errorElement.innerText = "";
+                    errorElement.classList.remove('fadeOut');
+                    errorElement.style.display = "none";
+                }, 6000);
+            }
+        });
+
+        upgradeElement.addEventListener('click', function() {
+            if (score >= 300) {
+                score -= 300;
+                multiplier = 2;
+                scoreElement.innerText = score;
+                upgradeElement.style.display = 'none';
+                localStorage.setItem('score', score);
+                localStorage.setItem('multiplier', multiplier);
+            } else {
+                errorElement.innerText = "you don't have enough Mahyar Coin";
+                errorElement.style.display = "block";
+                setTimeout(() => {
+                    errorElement.classList.add('fadeOut');
+                }, 5000);
+                setTimeout(() => {
+                    errorElement.innerText = "";
+                    errorElement.classList.remove('fadeOut');
+                    errorElement.style.display = "none";
+                }, 6000);
+            }
+        });
+
+        turboElement.addEventListener('click', function() {
+            if (turboRemaining > 0) {
+                turboRemaining--;
+                localStorage.setItem('turboRemaining', turboRemaining);
+                updateTurboCount();
+
+                let originalBarValue = barValue;
+                barValue = Math.min(maxBarValue, barValue * 3);
+                updateBar();
+                coinElement.style.backgroundColor = 'red';
+
+                setTimeout(() => {
+                    barValue = originalBarValue;
+                    updateBar();
+                    coinElement.style.backgroundColor = 'gold';
+                }, 15000);
+            } else {
+                errorElement.innerText = "No turbo boosts left for today.";
+                errorElement.style.display = "block";
+                setTimeout(() => {
+                    errorElement.classList.add('fadeOut');
+                }, 5000);
+                setTimeout(() => {
+                    errorElement.innerText = "";
+                    errorElement.classList.remove('fadeOut');
+                    errorElement.style.display = "none";
+                }, 6000);
+            }
+        });
+
+        resetElement.addEventListener('click', function() {
+            score = 0;
+            multiplier = 1;
+            barValue = maxBarValue;
+            turboRemaining = 3;
+            scoreElement.innerText = score;
+            updateBar();
+            updateTurboCount();
+            upgradeElement.style.display = 'block';
+            localStorage.setItem('score', score);
+            localStorage.setItem('multiplier', multiplier
