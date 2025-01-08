@@ -48,10 +48,13 @@
         }
         .scoreboard {
             margin-top: 20px;
-            font-size: 2em;
+            font-size: 3em;
         }
         .upgrade {
-            margin-top: 20px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             padding: 10px 20px;
             font-size: 1.2em;
             color: white;
@@ -138,7 +141,7 @@
         <div class="scoreboard">
             <span id="score">0</span>
         </div>
-        <div class="upgrade" id="upgrade">2x tap (Cost: 1500 Mahyar Coin)</div>
+        <div class="upgrade" id="upgrade">2x tap (Cost: 150 Mahyar Coin)</div>
         <div class="error" id="error"></div>
     </div>
 
@@ -203,8 +206,8 @@
         });
 
         upgradeElement.addEventListener('click', function() {
-            if (score >= 1500) {
-                score -= 1500;
+            if (score >= 150) {
+                score -= 150;
                 multiplier = 2;
                 scoreElement.innerText = score;
                 localStorage.setItem('score', score);
@@ -233,10 +236,10 @@
                 const newUpgradeElement = document.createElement('div');
                 newUpgradeElement.className = 'upgrade';
                 newUpgradeElement.id = 'upgrade';
-                newUpgradeElement.innerText = '2x tap (Cost: 1500 Mahyar Coin)';
+                newUpgradeElement.innerText = '2x tap (Cost: 150 Mahyar Coin)';
                 newUpgradeElement.addEventListener('click', function() {
-                    if (score >= 1500) {
-                        score -= 1500;
+                    if (score >= 150) {
+                        score -= 150;
                         multiplier = 2;
                         scoreElement.innerText = score;
                         localStorage.setItem('score', score);
