@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fa">
 <head>
@@ -28,13 +29,10 @@
         .coin {
             width: 100px;
             height: 100px;
-            background-image: <img src="./my_coin.png.jpg">;
-');
-            background-size: cover;
+            background-color: gold;
             border-radius: 50%;
             display: inline-block;
             position: relative;
-            cursor: pointer;
         }
         .scoreboard {
             margin-top: 20px;
@@ -130,3 +128,40 @@
 
         upgradeElement.addEventListener('click', function() {
             if (score >= 1500) {
+                score -= 1500;
+                multiplier = 2;
+                scoreElement.innerText = score;
+                localStorage.setItem('score', score);
+                localStorage.setItem('multiplier', multiplier);
+            } else {
+                errorElement.innerText = "you don't have enough Mahyar Coin";
+                setTimeout(() => {
+                    errorElement.classList.add('fadeOut');
+                }, 5000);
+                setTimeout(() => {
+                    errorElement.innerText = "";
+                    errorElement.classList.remove('fadeOut');
+                }, 6000);
+            }
+        });
+
+        resetElement.addEventListener('click', function() {
+            score = 0;
+            multiplier = 1;
+            scoreElement.innerText = score;
+            localStorage.setItem('score', score);
+            localStorage.setItem('multiplier', multiplier);
+        });
+
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('score')) {
+                score = parseInt(localStorage.getItem('score'));
+                scoreElement.innerText = score;
+            }
+            if (localStorage.getItem('multiplier')) {
+                multiplier = parseInt(localStorage.getItem('multiplier'));
+            }
+        });
+    </script>
+</body>
+</html>
