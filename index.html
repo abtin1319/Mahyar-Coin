@@ -70,11 +70,11 @@
         }
         .particle {
             position: absolute;
-            width: 10px;
-            height: 10px;
-            background-color: rgba(255, 215, 0, 0.8);
+            width: 15px;
+            height: 15px;
+            background-color: rgba(255, 215, 0, 0.9);
             border-radius: 50%;
-            animation: fadeInOut 2s ease-in-out forwards;
+            animation: fadeInOut 1.5s ease-in-out forwards;
         }
         @keyframes hitAnimation {
             0% { transform: scale(1); }
@@ -106,7 +106,7 @@
         <div class="scoreboard">
             <span id="score">0</span>
         </div>
-        <div class="upgrade" id="upgrade">2x tap (Cost: 250 Mahyar Coin)</div>
+        <div class="upgrade" id="upgrade">2x tap (Cost: 1500 Mahyar Coin)</div>
         <div class="error" id="error"></div>
     </div>
 
@@ -126,7 +126,7 @@
                 particle.style.left = `${Math.random() * 100}%`;
                 particle.style.top = `${Math.random() * 100}%`;
                 coinElement.appendChild(particle);
-                setTimeout(() => particle.remove(), 2000);
+                setTimeout(() => particle.remove(), 1500);
             }
         }
 
@@ -156,8 +156,8 @@
         });
 
         upgradeElement.addEventListener('click', function() {
-            if (score >= 250) {
-                score -= 250;
+            if (score >= 1500) {
+                score -= 1500;
                 multiplier = 2;
                 scoreElement.innerText = score;
                 localStorage.setItem('score', score);
