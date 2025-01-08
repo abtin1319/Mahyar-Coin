@@ -167,7 +167,7 @@
 
     <script>
         let score = 0;
-        let multiplier = 1;
+        let multiplier = 1; // تعداد سکه‌ها در حالت عادی
         const coinElement = document.getElementById('coin');
         const scoreElement = document.getElementById('score');
         const upgradeElement = document.getElementById('upgrade');
@@ -176,6 +176,27 @@
         const resetElement = document.getElementById('reset');
         let boosterActive = false;
 
+        // افزایش امتیاز با هر کلیک روی سکه
+        coinElement.addEventListener('click', function() {
+            score += multiplier; // در حالت عادی تعداد سکه‌ها 1 است
+            scoreElement.textContent = score; // به‌روزرسانی نمایش امتیاز
+            createParticles(); // ایجاد ذرات برای اثرات
+        });
+
+        // فعال سازی بوستر فلافل
+        boosterElement.addEventListener('click', function() {
+            if (!boosterActive) {
+                boosterActive = true;
+                multiplier = 7; // ضرب کننده رو به 7 تغییر می‌دهیم
+                createBoosterParticles(); // ایجاد ذرات برای بوستر
+                setTimeout(() => {
+                    multiplier = 1; // بعد از 8 ثانیه ضرب کننده به حالت اول باز می‌گردد
+                    boosterActive = false;
+                }, 8000); // مدت زمان تاثیر بوستر (8 ثانیه)
+            }
+        });
+
+        // کد مربوط به ایجاد ذرات
         function createParticles() {
             for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
@@ -190,18 +211,7 @@
             }
         }
 
-        function createTextParticles() {
-            for (let i = 0; i < 10; i++) {
-                const textParticle = document.createElement('div');
-                textParticle.className = 'particle-text';
-                textParticle.innerText = '2X';
-                textParticle.style.left = `${Math.random() * 100}vw`;
-                textParticle.style.top = `${Math.random() * 100}vh`;
-                document.body.appendChild(textParticle);
-                setTimeout(() => textParticle.remove(), 1000);
-            }
-        }
-
+        // ایجاد ذرات برای بوستر
         function createBoosterParticles() {
             for (let i = 0; i < 20; i++) {
                 const boosterParticle = document.createElement('div');
@@ -216,6 +226,13 @@
             }
         }
 
-        boosterElement.addEventListener('click', function() {
-            if (!boosterActive) {
-                boosterActive = true;
+        // دکمه ریست برای بازنشانی امتیاز
+        resetElement.addEventListener('click', function() {
+            score = 0;
+            scoreElement.textContent = score;
+            multiplier = 1; // بازگشت به حالت عادی
+            boosterActive = false;
+        });
+    </script>
+</body>
+</html>
