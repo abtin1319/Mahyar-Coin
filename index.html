@@ -88,7 +88,7 @@
         <div class="scoreboard">
             <span id="score">0</span>
         </div>
-        <div class="upgrade" id="upgrade">2x tap (Cost: 1500 Mahyar Coin)</div>
+        <div class="upgrade" id="upgrade">2x tap (Cost: 300 Mahyar Coin)</div>
         <div class="error" id="error"></div>
     </div>
 
@@ -127,8 +127,8 @@
         });
 
         upgradeElement.addEventListener('click', function() {
-            if (score >= 1500) {
-                score -= 1500;
+            if (score >= 300) {
+                score -= 300;
                 multiplier = 2;
                 scoreElement.innerText = score;
                 localStorage.setItem('score', score);
