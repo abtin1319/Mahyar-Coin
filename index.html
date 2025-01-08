@@ -70,10 +70,11 @@
         }
         .particle {
             position: absolute;
-            width: 15px;
-            height: 15px;
+            width: 10px;
+            height: 10px;
             background-color: rgba(255, 215, 0, 0.9);
             border-radius: 50%;
+            opacity: 0;
             animation: fadeInOut 1.5s ease-in-out forwards;
         }
         @keyframes hitAnimation {
@@ -106,7 +107,7 @@
         <div class="scoreboard">
             <span id="score">0</span>
         </div>
-        <div class="upgrade" id="upgrade">2x tap (Cost: 250 Mahyar Coin)</div>
+        <div class="upgrade" id="upgrade">2x tap (Cost: 200 Mahyar Coin)</div>
         <div class="error" id="error"></div>
     </div>
 
@@ -123,8 +124,11 @@
             for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
+                particle.style.left = `${50 + (Math.random() * 60 - 30)}px`;
+                particle.style.top = `${50 + (Math.random() * 60 - 30)}px`;
+                particle.style.width = `${5 + Math.random() * 10}px`;
+                particle.style.height = particle.style.width;
+                particle.style.backgroundColor = `rgba(255, 215, 0, ${Math.random() * 0.5 + 0.5})`;
                 coinElement.appendChild(particle);
                 setTimeout(() => particle.remove(), 1500);
             }
@@ -156,8 +160,8 @@
         });
 
         upgradeElement.addEventListener('click', function() {
-            if (score >= 250) {
-                score -= 250;
+            if (score >= 200) {
+                score -= 200;
                 multiplier = 2;
                 scoreElement.innerText = score;
                 localStorage.setItem('score', score);
@@ -185,10 +189,10 @@
                 const newUpgradeElement = document.createElement('div');
                 newUpgradeElement.className = 'upgrade';
                 newUpgradeElement.id = 'upgrade';
-                newUpgradeElement.innerText = '2x tap (Cost: 1500 Mahyar Coin)';
+                newUpgradeElement.innerText = '2x tap (Cost: 200 Mahyar Coin)';
                 newUpgradeElement.addEventListener('click', function() {
-                    if (score >= 250) {
-                        score -= 250;
+                    if (score >= 200) {
+                        score -= 200;
                         multiplier = 2;
                         scoreElement.innerText = score;
                         localStorage.setItem('score', score);
