@@ -13,7 +13,6 @@
             font-size: 2.5em;
             color: #fff200;
             font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
         }
         body {
             display: flex;
@@ -46,7 +45,6 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
-            border: 2px solid black;
         }
         .scoreboard {
             margin-top: 20px;
@@ -64,18 +62,6 @@
             border-radius: 5px;
             cursor: pointer;
             display: inline-block;
-        }
-        .booster {
-            position: absolute;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            font-size: 1.2em;
-            color: white;
-            background-color: orange;
-            border-radius: 5px;
-            cursor: pointer;
         }
         .animate {
             animation: hitAnimation 0.3s ease-in-out;
@@ -141,11 +127,6 @@
             50% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-10px); }
         }
-        @keyframes fall {
-            0% { opacity: 0; transform: translateY(-100px); }
-            50% { opacity: 1; }
-            100% { opacity: 0; transform: translateY(100vh); }
-        }
     </style>
 </head>
 <body>
@@ -160,43 +141,19 @@
         <div class="scoreboard">
             <span id="score">0</span>
         </div>
-        <div class="booster" id="booster">Felafel Booster (Free)</div>
         <div class="upgrade" id="upgrade">2x tap (Cost: 150 Mahyar Coin)</div>
         <div class="error" id="error"></div>
     </div>
 
     <script>
         let score = 0;
-        let multiplier = 1; // تعداد سکه‌ها در حالت عادی
+        let multiplier = 1;
         const coinElement = document.getElementById('coin');
         const scoreElement = document.getElementById('score');
         const upgradeElement = document.getElementById('upgrade');
-        const boosterElement = document.getElementById('booster');
         const errorElement = document.getElementById('error');
         const resetElement = document.getElementById('reset');
-        let boosterActive = false;
 
-        // افزایش امتیاز با هر کلیک روی سکه
-        coinElement.addEventListener('click', function() {
-            score += multiplier; // در حالت عادی تعداد سکه‌ها 1 است
-            scoreElement.textContent = score; // به‌روزرسانی نمایش امتیاز
-            createParticles(); // ایجاد ذرات برای اثرات
-        });
-
-        // فعال سازی بوستر فلافل
-        boosterElement.addEventListener('click', function() {
-            if (!boosterActive) {
-                boosterActive = true;
-                multiplier = 7; // ضرب کننده رو به 7 تغییر می‌دهیم
-                createBoosterParticles(); // ایجاد ذرات برای بوستر
-                setTimeout(() => {
-                    multiplier = 1; // بعد از 8 ثانیه ضرب کننده به حالت اول باز می‌گردد
-                    boosterActive = false;
-                }, 8000); // مدت زمان تاثیر بوستر (8 ثانیه)
-            }
-        });
-
-        // کد مربوط به ایجاد ذرات
         function createParticles() {
             for (let i = 0; i < 20; i++) {
                 const particle = document.createElement('div');
@@ -211,27 +168,105 @@
             }
         }
 
-        // ایجاد ذرات برای بوستر
-        function createBoosterParticles() {
-            for (let i = 0; i < 20; i++) {
-                const boosterParticle = document.createElement('div');
-                boosterParticle.className = 'particle';
-                boosterParticle.style.left = `${Math.random() * 100}vw`;
-                boosterParticle.style.top = `-10px`;
-                boosterParticle.style.backgroundColor = 'orange';
-                boosterParticle.style.opacity = 1;
-                boosterParticle.style.animation = 'fall 7s linear forwards';
-                document.body.appendChild(boosterParticle);
-                setTimeout(() => boosterParticle.remove(), 7000);
+        function createTextParticles() {
+            for (let i = 0; i < 10; i++) {
+                const textParticle = document.createElement('div');
+                textParticle.className = 'particle-text';
+                textParticle.innerText = '2X';
+                textParticle.style.left = `${Math.random() * 100}vw`;
+                textParticle.style.top = `${Math.random() * 100}vh`;
+                document.body.appendChild(textParticle);
+                setTimeout(() => textParticle.remove(), 1000);
             }
         }
 
-        // دکمه ریست برای بازنشانی امتیاز
+        coinElement.addEventListener('click', function(event) {
+            score += multiplier;
+            scoreElement.innerText = score;
+
+            // نمایش انیمیشن ضربه
+            this.classList.remove('animate');
+            void this.offsetWidth; // ترفند برای ریست انیمیشن
+            this.classList.add('animate');
+
+            // نمایش +1 یا +2
+            const point = document.createElement('div');
+            point.className = 'point';
+            point.style.left = `${event.clientX - this.offsetLeft}px`;
+            point.style.top = `${event.clientY - this.offsetTop}px`;
+            point.innerText = `+${multiplier}`;
+            this.appendChild(point);
+
+            setTimeout(() => {
+                point.remove();
+            }, 1000);
+
+            // ذخیره امتیاز
+            localStorage.setItem('score', score);
+        });
+
+        upgradeElement.addEventListener('click', function() {
+            if (score >= 150) {
+                score -= 150;
+                multiplier = 2;
+                scoreElement.innerText = score;
+                localStorage.setItem('score', score);
+                localStorage.setItem('multiplier', multiplier);
+                upgradeElement.remove(); // حذف دکمه ارتقا پس از خرید
+                createParticles(); // ایجاد پارتیکل‌های جذاب
+                createTextParticles(); // ایجاد پارتیکل‌های متنی 2X
+            } else {
+                errorElement.innerText = "you do not have enough Mahyar Coins";
+                errorElement.classList.add('show');
+                setTimeout(() => {
+                    errorElement.classList.remove('show');
+                }, 3000);
+            }
+        });
+
         resetElement.addEventListener('click', function() {
             score = 0;
-            scoreElement.textContent = score;
-            multiplier = 1; // بازگشت به حالت عادی
-            boosterActive = false;
+            multiplier = 1;
+            scoreElement.innerText = score;
+            localStorage.setItem('score', score);
+            localStorage.setItem('multiplier', multiplier);
+
+            // بازگرداندن دکمه ارتقا
+            if (!document.getElementById('upgrade')) {
+                const newUpgradeElement = document.createElement('div');
+                newUpgradeElement.className = 'upgrade';
+                newUpgradeElement.id = 'upgrade';
+                newUpgradeElement.innerText = '2x tap (Cost: 150 Mahyar Coin)';
+                newUpgradeElement.addEventListener('click', function() {
+                    if (score >= 150) {
+                        score -= 150;
+                        multiplier = 2;
+                        scoreElement.innerText = score;
+                        localStorage.setItem('score', score);
+                        localStorage.setItem('multiplier', multiplier);
+                        newUpgradeElement.remove();
+                        createParticles();
+                        createTextParticles();
+                    } else {
+                        errorElement.innerText = "you do not have enough Mahyar Coins";
+                        errorElement.classList.add('show');
+                        setTimeout(() => {
+                            errorElement.classList.remove('show');
+                        }, 3000);
+                    }
+                });
+                document.querySelector('.container').appendChild(newUpgradeElement);
+            }
+        });
+
+        window.addEventListener('load', function() {
+            if (localStorage.getItem('score')) {
+                score = parseInt(localStorage.getItem('score'));
+                scoreElement.innerText = score;
+            }
+            if (localStorage.getItem('multiplier')) {
+                multiplier = parseInt(localStorage.getItem('multiplier'));
+            }
         });
     </script>
 </body>
