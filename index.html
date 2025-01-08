@@ -13,6 +13,7 @@
             margin: 0;
             background-color: #f0f0f0;
             font-family: Arial, sans-serif;
+            overflow: hidden;
         }
         .container {
             text-align: center;
@@ -77,6 +78,14 @@
             opacity: 0;
             animation: fadeInOut 1.5s ease-in-out forwards;
         }
+        .particle-text {
+            position: absolute;
+            color: rgba(0, 128, 255, 0.8);
+            font-size: 2em;
+            font-weight: bold;
+            opacity: 0;
+            animation: textFadeInOut 1s ease-in-out forwards;
+        }
         @keyframes hitAnimation {
             0% { transform: scale(1); }
             50% { transform: scale(1.2); }
@@ -94,6 +103,11 @@
             0% { opacity: 0; transform: scale(0.5); }
             50% { opacity: 1; transform: scale(1); }
             100% { opacity: 0; transform: scale(1.5); }
+        }
+        @keyframes textFadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            50% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
         }
     </style>
 </head>
@@ -134,6 +148,18 @@
             }
         }
 
+        function createTextParticles() {
+            for (let i = 0; i < 10; i++) {
+                const textParticle = document.createElement('div');
+                textParticle.className = 'particle-text';
+                textParticle.innerText = '2X';
+                textParticle.style.left = `${Math.random() * 100}vw`;
+                textParticle.style.top = `${Math.random() * 100}vh`;
+                document.body.appendChild(textParticle);
+                setTimeout(() => textParticle.remove(), 1000);
+            }
+        }
+
         coinElement.addEventListener('click', function(event) {
             score += multiplier;
             scoreElement.innerText = score;
@@ -168,6 +194,7 @@
                 localStorage.setItem('multiplier', multiplier);
                 upgradeElement.remove(); // حذف دکمه ارتقا پس از خرید
                 createParticles(); // ایجاد پارتیکل‌های جذاب
+                createTextParticles(); // ایجاد پارتیکل‌های متنی 2X
             } else {
                 errorElement.innerText = "you do not have enough Mahyar Coins";
                 errorElement.classList.add('show');
@@ -199,6 +226,7 @@
                         localStorage.setItem('multiplier', multiplier);
                         newUpgradeElement.remove();
                         createParticles();
+                        createTextParticles();
                     } else {
                         errorElement.innerText = "you do not have enough Mahyar Coins";
                         errorElement.classList.add('show');
