@@ -106,7 +106,7 @@
         <div class="scoreboard">
             <span id="score">0</span>
         </div>
-        <div class="upgrade" id="upgrade">2x tap (Cost: 1500 Mahyar Coin)</div>
+        <div class="upgrade" id="upgrade">2x tap (Cost: 250 Mahyar Coin)</div>
         <div class="error" id="error"></div>
     </div>
 
@@ -156,8 +156,8 @@
         });
 
         upgradeElement.addEventListener('click', function() {
-            if (score >= 1500) {
-                score -= 1500;
+            if (score >= 250) {
+                score -= 250;
                 multiplier = 2;
                 scoreElement.innerText = score;
                 localStorage.setItem('score', score);
@@ -179,6 +179,32 @@
             scoreElement.innerText = score;
             localStorage.setItem('score', score);
             localStorage.setItem('multiplier', multiplier);
+
+            // بازگرداندن دکمه ارتقا
+            if (!document.getElementById('upgrade')) {
+                const newUpgradeElement = document.createElement('div');
+                newUpgradeElement.className = 'upgrade';
+                newUpgradeElement.id = 'upgrade';
+                newUpgradeElement.innerText = '2x tap (Cost: 1500 Mahyar Coin)';
+                newUpgradeElement.addEventListener('click', function() {
+                    if (score >= 250) {
+                        score -= 250;
+                        multiplier = 2;
+                        scoreElement.innerText = score;
+                        localStorage.setItem('score', score);
+                        localStorage.setItem('multiplier', multiplier);
+                        newUpgradeElement.remove();
+                        createParticles();
+                    } else {
+                        errorElement.innerText = "you do not have enough Mahyar Coins";
+                        errorElement.classList.add('show');
+                        setTimeout(() => {
+                            errorElement.classList.remove('show');
+                        }, 3000);
+                    }
+                });
+                document.querySelector('.container').appendChild(newUpgradeElement);
+            }
         });
 
         window.addEventListener('load', function() {
